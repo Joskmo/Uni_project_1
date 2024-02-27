@@ -1,0 +1,77 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+const int NUM_OF_MONTHS = 12, BASE_YEAR = 1919;
+
+int input_int(int low_lim, int high_lim) {
+    string input;
+    int test = 0, flag = 0, output = 0;
+    cin >> input;
+    while (flag == 0) {
+        for (int i = 0; i < input.size(); i++) {
+            test = ((int)input[i] > 47 && (int)input[i] < 58);
+            if (test == 0) {
+                cout << "Проверьте введённые данные" << endl;
+                cin >> input;
+            }
+        }
+        output = stoi(input);
+        if (output < low_lim || output > high_lim) {
+            cout << "Проверьте введённые данные" << endl;
+            cin >> input;            
+        }
+        else 
+            flag++;
+    }
+    return output;
+}
+
+int leap_year(int year) {
+    return (!(year % 400)) || (year % 100 != 0 && year % 4 == 0);
+}
+
+int month_days(int month, int year) {
+    int month_days[NUM_OF_MONTHS] = { 31, 28 + leap_year(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    return month_days[month - 1];
+}
+
+int first_day_detecting(int month, int year) {
+    int amount_of_days = 0;
+    for (int i = BASE_YEAR; i <= (year - 1); i++) // подсчёт дней с базового года (1919)
+        amount_of_days += (365 + leap_year(i));
+    for (int i = 1; i < month; i++) // добавляем дни в незаконченном году
+        amount_of_days += month_days(i, year);
+    // int space = (amount_of_days + 2) % 7; // день начала недели
+    return (amount_of_days + 2) % 7;
+}
+
+void print_month(int month, int year) {
+    string name_of_months[NUM_OF_MONTHS] = { "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь" }; /* массив с именами месяцев
+нужен для упрощения вывода в консоль (верхняя строчка), так как на вход даётся номер месяца */
+    cout << name_of_months[month - 1] << " " << year << endl; // вывод названия месяца
+    cout << " ПН" << " ВТ" << " СР" << " ЧТ" << " ПТ" << " СБ" << " ВС" << endl << " ";
+    for (int i = 0; i < first_day_detecting(month, year); i++)
+        cout << "   ";
+    for (int i = 1; i <= month_days(month, year); i++) { // вывод чисел
+        if (i < 10)
+            cout << " ";
+        cout << i << " ";
+        if ((i + first_day_detecting (month, year)) % 7 == 0)
+            cout << endl << " ";
+    }
+    cout << endl;
+}
+
+int main()
+{
+    setlocale(LC_ALL, "Russian"); // установка Русского языка для корректного вывода в консоль
+    cout << "Введите месяц и год: ";
+    int month = input_int(1, NUM_OF_MONTHS);
+    int year = input_int(BASE_YEAR, 2029);
+    first_day_detecting(month, year);
+    print_month(month, year);
+    system("pause");
+    return 0;  
+}
